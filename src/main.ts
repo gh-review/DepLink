@@ -1,16 +1,45 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {DirectedGraph, IGraph, Node} from './graph'
+import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
+
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.']
+const cruiseOptions = {
+  includeOnly: '^src'
+}
+
+function buildGraphFromModule(
+  graph: IGraph<string, Node>,
+  currentModule: IModule
+): void {
+  const nextNodes = currentModule.dependencies || []
+  const curNodeName = currentModule.source
+  graph.addNode(curNodeName)
+
+  for (const element of nextNodes) {
+    const nextNodeName = element.resolved
+    // backwards because from the next edge back to the current node
+    // to discover what files are affected with a dependency change
+    graph.addEdge(nextNodeName, curNodeName)
+  }
+}
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const cruiseResult = cruise(
+      ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
+      cruiseOptions
+    ).output as ICruiseResult
+    console.dir(cruiseResult, {depth: 10})
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const graph = new DirectedGraph()
 
-    core.setOutput('time', new Date().toTimeString())
+    for (const module of cruiseResult.modules) {
+      buildGraphFromModule(graph, module)
+    }
+
+    core.debug(graph.toString())
+
+    core.setOutput('graph', graph.toString())
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
