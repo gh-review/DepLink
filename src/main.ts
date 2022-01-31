@@ -3,6 +3,7 @@ import * as github from '@actions/github'
 
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
+import * as fs from 'fs'
 
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
@@ -28,7 +29,7 @@ function buildGraphFromModule(
 
 async function run(): Promise<void> {
   try {
-    console.log(`Initial: ${dirPath}`)
+    console.log(`Initial: ${dirPath}`, fs.readdirSync(dirPath))
     const cruiseResult = cruise([dirPath], cruiseOptions)
       .output as ICruiseResult
     console.dir(cruiseResult, {depth: 10})
