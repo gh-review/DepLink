@@ -234,6 +234,7 @@ function run() {
                 buildGraphFromModule(graph, module);
             }
             console.log(graph.toString());
+            console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname);
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
             if (context.payload.pull_request == null) {

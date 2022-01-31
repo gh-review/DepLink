@@ -41,6 +41,7 @@ async function run(): Promise<void> {
       buildGraphFromModule(graph, module)
     }
     console.log(graph.toString())
+    console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname)
 
     const github_token = core.getInput('GITHUB_TOKEN')
 
