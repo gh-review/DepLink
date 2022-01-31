@@ -205,13 +205,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(42186));
 const github = __importStar(__nccwpck_require__(95438));
-const fs = __importStar(__nccwpck_require__(35747));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
-const dirPath = process.env.GITHUB_WORKSPACE || process.cwd();
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [
-    '/Users/sriharivishnu/Desktop/dev/DepLink'
-];
+const dirPath = process.env.GITHUB_WORKSPACE || '.';
 const cruiseOptions = {
     includeOnly: '^src',
     exclude: ['^(coverage|test|node_modules)', '__tests__']
@@ -230,7 +226,8 @@ function buildGraphFromModule(graph, currentModule) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const cruiseResult = (0, dependency_cruiser_1.cruise)(ARRAY_OF_FILES_AND_DIRS_TO_CRUISE, cruiseOptions).output;
+            const cruiseResult = (0, dependency_cruiser_1.cruise)([dirPath], cruiseOptions)
+                .output;
             console.dir(cruiseResult, { depth: 10 });
             const graph = new graph_1.DirectedGraph();
             for (const module of cruiseResult.modules) {
@@ -238,8 +235,6 @@ function run() {
             }
             console.log(graph.toString());
             console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname);
-            const arrayOfFiles = fs.readdirSync(dirPath);
-            console.log(arrayOfFiles);
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
             if (context.payload.pull_request == null) {

@@ -1,14 +1,10 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as fs from 'fs'
 
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
-const dirPath = process.env.GITHUB_WORKSPACE || process.cwd()
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [
-  '/Users/sriharivishnu/Desktop/dev/DepLink'
-]
+const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
   includeOnly: '^src',
   exclude: ['^(coverage|test|node_modules)', '__tests__']
@@ -32,10 +28,8 @@ function buildGraphFromModule(
 
 async function run(): Promise<void> {
   try {
-    const cruiseResult = cruise(
-      ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
-      cruiseOptions
-    ).output as ICruiseResult
+    const cruiseResult = cruise([dirPath], cruiseOptions)
+      .output as ICruiseResult
     console.dir(cruiseResult, {depth: 10})
 
     const graph = new DirectedGraph()
@@ -45,8 +39,6 @@ async function run(): Promise<void> {
     }
     console.log(graph.toString())
     console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname)
-    const arrayOfFiles = fs.readdirSync(dirPath)
-    console.log(arrayOfFiles)
 
     const github_token = core.getInput('GITHUB_TOKEN')
 
