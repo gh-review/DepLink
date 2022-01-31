@@ -207,7 +207,8 @@ const core = __importStar(__nccwpck_require__(42186));
 const github = __importStar(__nccwpck_require__(95438));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['../../'];
+const dirPath = process.env.GITHUB_WORKSPACE || process.cwd();
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [dirPath];
 const cruiseOptions = {
     includeOnly: '^src',
     exclude: ['^(coverage|test|node_modules)', '__tests__']
