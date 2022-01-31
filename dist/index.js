@@ -206,12 +206,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(42186));
 const fs = __importStar(__nccwpck_require__(35747));
 const github = __importStar(__nccwpck_require__(95438));
-const path = __importStar(__nccwpck_require__(85622));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
 const dirPath = process.env.GITHUB_WORKSPACE || '.';
 const cruiseOptions = {
-    includeOnly: path.join(dirPath, 'src'),
+    includeOnly: 'src',
     exclude: ['^(coverage|test|node_modules)', '__tests__']
 };
 function buildGraphFromModule(graph, currentModule) {
