@@ -238,7 +238,7 @@ function run() {
             }
             console.log(graph.toString());
             console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname);
-            const arrayOfFiles = fs.readdirSync('..');
+            const arrayOfFiles = fs.readdirSync(dirPath);
             console.log(arrayOfFiles);
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
