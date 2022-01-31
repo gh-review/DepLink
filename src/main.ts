@@ -7,7 +7,7 @@ import * as fs from 'fs'
 
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
-  includeOnly: '^src',
+  includeOnly: '^../src',
   exclude: ['^(coverage|test|node_modules)', '__tests__']
 }
 

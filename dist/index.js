@@ -210,7 +210,7 @@ const dependency_cruiser_1 = __nccwpck_require__(72700);
 const fs = __importStar(__nccwpck_require__(35747));
 const dirPath = process.env.GITHUB_WORKSPACE || '.';
 const cruiseOptions = {
-    includeOnly: '^src',
+    includeOnly: '^../src',
     exclude: ['^(coverage|test|node_modules)', '__tests__']
 };
 function buildGraphFromModule(graph, currentModule) {
@@ -228,8 +228,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             console.log(`Initial: ${dirPath}`, fs.readdirSync(dirPath));
-            const cruiseResult = (0, dependency_cruiser_1.cruise)([dirPath], cruiseOptions)
-                .output;
+            const cruiseResult = (0, dependency_cruiser_1.cruise)(['/Users/sriharivishnu/Desktop/dev/DepLink'], cruiseOptions).output;
             console.dir(cruiseResult, { depth: 10 });
             const graph = new graph_1.DirectedGraph();
             for (const module of cruiseResult.modules) {
