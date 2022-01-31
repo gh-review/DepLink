@@ -1,13 +1,14 @@
 import * as core from '@actions/core'
+import * as fs from 'fs'
 import * as github from '@actions/github'
+import * as path from 'path'
 
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
-import * as fs from 'fs'
 
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
-  includeOnly: '^../src',
+  includeOnly: path.join(dirPath, 'src'),
   exclude: ['^(coverage|test|node_modules)', '__tests__']
 }
 
