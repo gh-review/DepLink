@@ -226,6 +226,7 @@ function buildGraphFromModule(graph, currentModule) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            console.log(`Initial: ${dirPath}`);
             const cruiseResult = (0, dependency_cruiser_1.cruise)([dirPath], cruiseOptions)
                 .output;
             console.dir(cruiseResult, { depth: 10 });

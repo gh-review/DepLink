@@ -28,6 +28,7 @@ function buildGraphFromModule(
 
 async function run(): Promise<void> {
   try {
+    console.log(`Initial: ${dirPath}`)
     const cruiseResult = cruise([dirPath], cruiseOptions)
       .output as ICruiseResult
     console.dir(cruiseResult, {depth: 10})
