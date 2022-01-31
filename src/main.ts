@@ -3,9 +3,10 @@ import * as github from '@actions/github'
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['src/']
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.']
 const cruiseOptions = {
-  includeOnly: '^src'
+  includeOnly: '^src',
+  exclude: ['^(coverage|test|node_modules)', '__tests__']
 }
 
 function buildGraphFromModule(
@@ -37,6 +38,7 @@ async function run(): Promise<void> {
     for (const module of cruiseResult.modules) {
       buildGraphFromModule(graph, module)
     }
+    core.debug(graph.toString())
 
     const github_token = core.getInput('GITHUB_TOKEN')
 
@@ -52,10 +54,8 @@ async function run(): Promise<void> {
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pull_request_number,
-      body: ` \`\`\`${graph.toString()}\`\`\``
+      body: ` \`\`\` \n${graph.toString()}\n \`\`\``
     })
-
-    core.debug(graph.toString())
 
     core.setOutput('graph', graph.toString())
   } catch (error) {

@@ -207,9 +207,10 @@ const core = __importStar(__nccwpck_require__(42186));
 const github = __importStar(__nccwpck_require__(95438));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['src/'];
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.'];
 const cruiseOptions = {
-    includeOnly: '^src'
+    includeOnly: '^src',
+    exclude: ['^(coverage|test|node_modules)', '__tests__']
 };
 function buildGraphFromModule(graph, currentModule) {
     const nextNodes = currentModule.dependencies || [];
@@ -231,6 +232,7 @@ function run() {
             for (const module of cruiseResult.modules) {
                 buildGraphFromModule(graph, module);
             }
+            core.debug(graph.toString());
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
             if (context.payload.pull_request == null) {
@@ -239,8 +241,7 @@ function run() {
             }
             const pull_request_number = context.payload.pull_request.number;
             const octokit = github.getOctokit(github_token);
-            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_request_number, body: ` \`\`\`${graph.toString()}\`\`\`` }));
-            core.debug(graph.toString());
+            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_request_number, body: ` \`\`\` \n${graph.toString()}\n \`\`\`` }));
             core.setOutput('graph', graph.toString());
         }
         catch (error) {
