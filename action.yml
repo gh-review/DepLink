@@ -1,11 +1,12 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'DepLink'
+description: 'Links your dependencies so you can track down affected files'
+author: 'DepLink'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    GITHUB_TOKEN:
+      description: 'Github token of the repository (automatically created by Github)'
+      required: true
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.GITHUB_TOKEN}}
