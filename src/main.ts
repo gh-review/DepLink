@@ -1,9 +1,11 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.']
+const dirPath = process.env.GITHUB_WORKSPACE || process.cwd()
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [dirPath]
 const cruiseOptions = {
   includeOnly: '^src',
   exclude: ['^(coverage|test|node_modules)', '__tests__']
