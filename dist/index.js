@@ -232,7 +232,7 @@ function run() {
             for (const module of cruiseResult.modules) {
                 buildGraphFromModule(graph, module);
             }
-            core.debug(graph.toString());
+            console.log(graph.toString());
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
             if (context.payload.pull_request == null) {
