@@ -2,6 +2,8 @@ import * as core from '@actions/core'
 import { DirectedGraph, IGraph, Node } from './graph'
 import { ICruiseResult, IModule, cruise } from 'dependency-cruiser'
 
+import extractTSConfig from "dependency-cruiser/src/config-utl/extract-ts-config";
+
 const currentWorkingDirectory = process.cwd()
 console.log("Current Directory", currentWorkingDirectory)
 
@@ -25,12 +27,16 @@ function buildGraphFromModule(
 }
 
 async function run(): Promise<void> {
+
+  const tsConfig = extractTSConfig(`${currentWorkingDirectory}/tsconfig.json`);
+
   try {
     const cruiseResult = cruise(
       ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
       {
-        tsPreCompilationDeps: true,
-      }
+        tsPreCompilationDeps: true
+      },
+      tsConfig
     ).output as ICruiseResult
     console.dir(cruiseResult, { depth: 10 })
 
@@ -44,6 +50,7 @@ async function run(): Promise<void> {
 
     core.setOutput('graph', graph.toString())
   } catch (error) {
+    console.log("Errt", error)
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
