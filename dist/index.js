@@ -224,10 +224,9 @@ console.log("Testtinggg logs");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Loggingg heree");
-        console.log(" Typescript config ");
         try {
             const cruiseResult = (0, dependency_cruiser_1.cruise)(ARRAY_OF_FILES_AND_DIRS_TO_CRUISE, {
-                tsPreCompilationDeps: true
+                includeOnly: "src",
             }, {}, {
                 "compilerOptions": {
                     "target": "es6",

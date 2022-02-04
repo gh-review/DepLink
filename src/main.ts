@@ -30,13 +30,11 @@ console.log("Testtinggg logs")
 async function run(): Promise<void> {
   console.log("Loggingg heree")
 
-  console.log(" Typescript config " )
-
   try {
     const cruiseResult = cruise(
       ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
       {
-        tsPreCompilationDeps: true
+        includeOnly: "src",
       },
       {},
       {
