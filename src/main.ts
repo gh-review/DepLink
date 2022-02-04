@@ -6,9 +6,7 @@ const currentWorkingDirectory = process.cwd()
 console.log("Current Directory", currentWorkingDirectory)
 
 const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [currentWorkingDirectory]
-const cruiseOptions = {
-  includeOnly: '^src'
-}
+const cruiseOptions = {}
 
 function buildGraphFromModule(
   graph: IGraph<string, Node>,
