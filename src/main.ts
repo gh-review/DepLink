@@ -2,6 +2,9 @@ import * as core from '@actions/core'
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
+const currentWorkingDirectory = process.cwd();
+console.log("Current Directory", currentWorkingDirectory)
+
 const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.']
 const cruiseOptions = {
   includeOnly: '^src'
