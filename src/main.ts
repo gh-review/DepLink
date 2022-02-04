@@ -35,6 +35,7 @@ async function run(): Promise<void> {
       ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
       {
         includeOnly: "src",
+        exclude: "node_modules"
       },
       {},
       {

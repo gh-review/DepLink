@@ -227,6 +227,7 @@ function run() {
         try {
             const cruiseResult = (0, dependency_cruiser_1.cruise)(ARRAY_OF_FILES_AND_DIRS_TO_CRUISE, {
                 includeOnly: "src",
+                exclude: "node_modules"
             }, {}, {
                 "compilerOptions": {
                     "target": "es6",
