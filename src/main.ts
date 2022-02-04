@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import { DirectedGraph, IGraph, Node } from './graph'
 import { ICruiseResult, IModule, cruise } from 'dependency-cruiser'
 
-import extractTSConfig from "dependency-cruiser/src/config-utl/extract-ts-config";
+import extractTSConfig from "dependency-cruiser/src/config-utl/";
 
 const currentWorkingDirectory = process.cwd()
 console.log("Current Directory", currentWorkingDirectory)
@@ -26,8 +26,11 @@ function buildGraphFromModule(
   }
 }
 
+console.log("Testtinggg logs")
+
 async function run(): Promise<void> {
-  const tsConfig = extractTSConfig(`${currentWorkingDirectory}/tsconfig.json`);
+  console.log("Loggingg heree")
+  const tsConfig = extractTSConfig(`${currentWorkingDirectory}/tsconfig.json`)
   console.log(" Typescript config " ,tsConfig)
 
   try {
@@ -37,7 +40,18 @@ async function run(): Promise<void> {
         tsPreCompilationDeps: true
       },
       {},
-      tsConfig
+      {
+        "compilerOptions": {
+          "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+          "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+          "outDir": "./lib",                        /* Redirect output structure to the directory. */
+          "rootDir": "./src",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
+          "strict": true,                           /* Enable all strict type-checking options. */
+          "noImplicitAny": true,                    /* Raise error on expressions and declarations with an implied 'any' type. */
+          "esModuleInterop": true                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+        },
+        "exclude": ["node_modules", "**/*.test.ts"]
+      }
     ).output as ICruiseResult
     console.dir(cruiseResult, { depth: 10 })
 
