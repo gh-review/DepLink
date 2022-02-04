@@ -27,8 +27,8 @@ function buildGraphFromModule(
 }
 
 async function run(): Promise<void> {
-
   const tsConfig = extractTSConfig(`${currentWorkingDirectory}/tsconfig.json`);
+  console.log(" Typescript config " ,tsConfig)
 
   try {
     const cruiseResult = cruise(
@@ -36,6 +36,7 @@ async function run(): Promise<void> {
       {
         tsPreCompilationDeps: true
       },
+      {},
       tsConfig
     ).output as ICruiseResult
     console.dir(cruiseResult, { depth: 10 })
