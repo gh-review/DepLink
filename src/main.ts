@@ -2,10 +2,9 @@ import * as core from '@actions/core'
 import { DirectedGraph, IGraph, Node } from './graph'
 import { ICruiseResult, IModule, cruise } from 'dependency-cruiser'
 
-import extractTSConfig from "dependency-cruiser/src/config-utl/";
 
 const currentWorkingDirectory = process.cwd()
-console.log("Current Directory", currentWorkingDirectory)
+console.log("Current Directory Testt", currentWorkingDirectory)
 
 const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [currentWorkingDirectory]
 
@@ -30,8 +29,8 @@ console.log("Testtinggg logs")
 
 async function run(): Promise<void> {
   console.log("Loggingg heree")
-  const tsConfig = extractTSConfig(`${currentWorkingDirectory}/tsconfig.json`)
-  console.log(" Typescript config " ,tsConfig)
+
+  console.log(" Typescript config " )
 
   try {
     const cruiseResult = cruise(

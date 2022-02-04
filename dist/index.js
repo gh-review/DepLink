@@ -207,11 +207,8 @@ const core = __importStar(__nccwpck_require__(42186));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
 const currentWorkingDirectory = process.cwd();
-console.log("Current Directory", currentWorkingDirectory);
-const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.'];
-const cruiseOptions = {
-    includeOnly: '^src'
-};
+console.log("Current Directory Testt", currentWorkingDirectory);
+const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [currentWorkingDirectory];
 function buildGraphFromModule(graph, currentModule) {
     const nextNodes = currentModule.dependencies || [];
     const curNodeName = currentModule.source;
@@ -223,10 +220,26 @@ function buildGraphFromModule(graph, currentModule) {
         graph.addEdge(nextNodeName, curNodeName);
     }
 }
+console.log("Testtinggg logs");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("Loggingg heree");
+        console.log(" Typescript config ");
         try {
-            const cruiseResult = (0, dependency_cruiser_1.cruise)(ARRAY_OF_FILES_AND_DIRS_TO_CRUISE, cruiseOptions).output;
+            const cruiseResult = (0, dependency_cruiser_1.cruise)(ARRAY_OF_FILES_AND_DIRS_TO_CRUISE, {
+                tsPreCompilationDeps: true
+            }, {}, {
+                "compilerOptions": {
+                    "target": "es6",
+                    "module": "commonjs",
+                    "outDir": "./lib",
+                    "rootDir": "./src",
+                    "strict": true,
+                    "noImplicitAny": true,
+                    "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+                },
+                "exclude": ["node_modules", "**/*.test.ts"]
+            }).output;
             console.dir(cruiseResult, { depth: 10 });
             const graph = new graph_1.DirectedGraph();
             for (const module of cruiseResult.modules) {
@@ -236,6 +249,7 @@ function run() {
             core.setOutput('graph', graph.toString());
         }
         catch (error) {
+            console.log("Errt", error);
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
