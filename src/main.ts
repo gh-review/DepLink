@@ -1,12 +1,12 @@
 import * as core from '@actions/core'
-import {DirectedGraph, IGraph, Node} from './graph'
-import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
+import { DirectedGraph, IGraph, Node } from './graph'
+import { ICruiseResult, IModule, cruise } from 'dependency-cruiser'
 
 const currentWorkingDirectory = process.cwd()
 console.log("Current Directory", currentWorkingDirectory)
 
 const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = [currentWorkingDirectory]
-const cruiseOptions = {}
+
 
 function buildGraphFromModule(
   graph: IGraph<string, Node>,
@@ -28,9 +28,11 @@ async function run(): Promise<void> {
   try {
     const cruiseResult = cruise(
       ARRAY_OF_FILES_AND_DIRS_TO_CRUISE,
-      cruiseOptions
+      {
+        tsPreCompilationDeps: true,
+      }
     ).output as ICruiseResult
-    console.dir(cruiseResult, {depth: 10})
+    console.dir(cruiseResult, { depth: 10 })
 
     const graph = new DirectedGraph()
 
