@@ -206,6 +206,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(42186));
 const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
+const currentWorkingDirectory = process.cwd();
+console.log("Current Directory", currentWorkingDirectory);
 const ARRAY_OF_FILES_AND_DIRS_TO_CRUISE = ['.'];
 const cruiseOptions = {
     includeOnly: '^src'
