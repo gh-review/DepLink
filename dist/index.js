@@ -211,7 +211,10 @@ const dependency_cruiser_1 = __nccwpck_require__(72700);
 const dirPath = process.env.GITHUB_WORKSPACE || '.';
 const cruiseOptions = {
     includeOnly: 'src',
-    exclude: ['^(coverage|test|node_modules)', '__tests__']
+    exclude: ['^(coverage|test|node_modules)', '__tests__'],
+    tsConfig: {
+        fileName: 'tsconfig.json'
+    }
 };
 function buildGraphFromModule(graph, currentModule) {
     const nextNodes = currentModule.dependencies || [];

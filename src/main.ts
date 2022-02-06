@@ -8,7 +8,10 @@ import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
   includeOnly: 'src',
-  exclude: ['^(coverage|test|node_modules)', '__tests__']
+  exclude: ['^(coverage|test|node_modules)', '__tests__'],
+  tsConfig: {
+    fileName: 'tsconfig.json'
+  }
 }
 
 function buildGraphFromModule(
