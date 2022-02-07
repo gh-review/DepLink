@@ -1,2 +1,2 @@
 #!/bin/sh
-node ./dist/index.js
+node /prod/dist/index.js
