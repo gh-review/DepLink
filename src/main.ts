@@ -2,8 +2,8 @@ import * as core from '@actions/core'
 import * as fs from 'fs'
 import * as github from '@actions/github'
 
-import {DirectedGraph, IGraph, Node} from './graph'
-import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
+import { DirectedGraph, IGraph, Node } from './graph'
+import { ICruiseResult, IModule, cruise } from 'dependency-cruiser'
 
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
@@ -35,7 +35,7 @@ async function run(): Promise<void> {
     console.log(`Initial: ${dirPath}`, fs.readdirSync(dirPath))
     const cruiseResult = cruise([dirPath], cruiseOptions)
       .output as ICruiseResult
-    console.dir(cruiseResult, {depth: 10})
+    console.dir(cruiseResult, { depth: 10 })
 
     const graph = new DirectedGraph()
 
@@ -48,11 +48,14 @@ async function run(): Promise<void> {
     const github_token = core.getInput('GITHUB_TOKEN')
 
     const context = github.context
+    console.log(context, github.context.eventName)
     if (context.payload.pull_request == null) {
       core.setFailed('No pull request found.')
       return
     }
     const pull_request_number = context.payload.pull_request.number
+
+    console.log(context.payload.pull_request)
 
     const octokit = github.getOctokit(github_token)
 
