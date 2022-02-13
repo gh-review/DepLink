@@ -242,15 +242,15 @@ function run() {
             console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname);
             const github_token = core.getInput('GITHUB_TOKEN');
             const context = github.context;
-            console.log(context, github.context.eventName);
-            if (context.payload.pull_request == null) {
+            if (context.payload.pull_request == null ||
+                context.eventName !== 'pull_request') {
                 core.setFailed('No pull request found.');
                 return;
             }
-            const pull_request_number = context.payload.pull_request.number;
-            console.log(context.payload.pull_request);
+            const pullRequest = context.payload.pull_request;
             const octokit = github.getOctokit(github_token);
-            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_request_number, body: ` \`\`\` \n${graph.toString()}\n \`\`\`` }));
+            console.log(yield octokit.rest.repos.compareCommits(Object.assign(Object.assign({}, context.repo), { base: pullRequest.base.sha, head: pullRequest.head.sha })));
+            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pullRequest.number, body: ` \`\`\` \n${graph.toString()}\n \`\`\`` }));
             core.setOutput('graph', graph.toString());
         }
         catch (error) {
