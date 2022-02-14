@@ -66,7 +66,7 @@ async function run(): Promise<void> {
       head: pullRequest.head.sha
     })
 
-    console.log(comparisonDetails.data.files)
+    console.log(comparisonDetails.data.files?.filter(file => file.status === "modified").map(file => file.filename))
 
     await octokit.rest.issues.createComment({
       ...context.repo,
