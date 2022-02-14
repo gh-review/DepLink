@@ -60,13 +60,13 @@ async function run(): Promise<void> {
 
     const octokit = github.getOctokit(github_token)
 
-    console.log(
-      await octokit.rest.repos.compareCommits({
-        ...context.repo,
-        base: pullRequest.base.sha,
-        head: pullRequest.head.sha
-      })
-    )
+    const comparisonDetails = await octokit.rest.repos.compareCommits({
+      ...context.repo,
+      base: pullRequest.base.sha,
+      head: pullRequest.head.sha
+    })
+
+    console.log(comparisonDetails.data.files)
 
     await octokit.rest.issues.createComment({
       ...context.repo,
