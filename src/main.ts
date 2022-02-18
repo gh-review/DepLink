@@ -74,18 +74,16 @@ async function run(): Promise<void> {
       }
     }
 
-    const formattedString = affectedFiles.reduce(
-      (prev, cur) => `${prev}\n - ${cur}`,
+    const formattedString = `# Affected Files\n${affectedFiles.reduce(
+      (prev, cur) => `${prev}\n - \`${cur}\``,
       ''
-    )
+    )}`
 
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
       body: ` 
-        \`\`\` \n
         ${formattedString}\n 
-        \`\`\`
       `
     })
 
