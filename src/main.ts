@@ -82,7 +82,7 @@ async function run(): Promise<void> {
       }
     }
 
-    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${context.ref}/`
+    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${pullRequest.head.ref}/`
     const formattedString = `${affectedFiles.reduce(
       (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL + cur})`,
       ''
