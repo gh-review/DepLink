@@ -5,6 +5,7 @@ import * as github from '@actions/github'
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
+// test modify
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
   includeOnly: 'src',
@@ -65,8 +66,12 @@ async function run(): Promise<void> {
       base: pullRequest.base.sha,
       head: pullRequest.head.sha
     })
-
-    console.log(comparisonDetails.data.files?.filter(file => file.status === "modified").map(file => file.filename))
+    console.log(comparisonDetails.data)
+    console.log(
+      comparisonDetails.data.files
+        ?.filter(file => file.status === 'modified')
+        .map(file => file.filename)
+    )
 
     await octokit.rest.issues.createComment({
       ...context.repo,
