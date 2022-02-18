@@ -85,8 +85,8 @@ async function run(): Promise<void> {
 
       // output file title
       formattedString += `### ${
-        file.status === 'modified' ? 'Modified' : 'Removal of'
-      } ${getFormattedName(file.filename)}:\n`
+        file.status === 'modified' ? 'Changes in' : 'Removal of'
+      } ${getFormattedName(file.filename)} may affect:\n`
 
       // go through files which list the modified file as a dependency
       for (const dependency of fileNodeIncomingEdges) {
@@ -110,7 +110,7 @@ async function run(): Promise<void> {
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: `# Affected Files\n**${filteredFiles.length} file(s) changed**\n**${numAffectedFiles} file(s) affected**\n---\n${formattedString}\n`
+      body: `# Affected Files\n- Total Affected File(s): ${numAffectedFiles}\n---\n${formattedString}\n`
     })
 
     core.setOutput('graph', graph.toString())
