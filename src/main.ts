@@ -82,7 +82,7 @@ async function run(): Promise<void> {
       }
     }
 
-    const baseURL = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/`
+    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${context.ref}/`
     const formattedString = `${affectedFiles.reduce(
       (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL + cur})`,
       ''
