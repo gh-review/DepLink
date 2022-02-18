@@ -46,19 +46,31 @@ async function run(): Promise<void> {
     console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname)
 
     const github_token = core.getInput('GITHUB_TOKEN')
-
     const context = github.context
-    if (context.payload.pull_request == null) {
+
+    if (
+      context.payload.pull_request == null ||
+      context.eventName !== 'pull_request'
+    ) {
       core.setFailed('No pull request found.')
       return
     }
-    const pull_request_number = context.payload.pull_request.number
+
+    const pullRequest = context.payload.pull_request
 
     const octokit = github.getOctokit(github_token)
 
+    const comparisonDetails = await octokit.rest.repos.compareCommits({
+      ...context.repo,
+      base: pullRequest.base.sha,
+      head: pullRequest.head.sha
+    })
+
+    console.log(comparisonDetails.data.files?.filter(file => file.status === "modified").map(file => file.filename))
+
     await octokit.rest.issues.createComment({
       ...context.repo,
-      issue_number: pull_request_number,
+      issue_number: pullRequest.number,
       body: ` \`\`\` \n${graph.toString()}\n \`\`\``
     })
 
