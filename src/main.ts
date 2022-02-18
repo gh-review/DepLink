@@ -25,9 +25,7 @@ function buildGraphFromModule(
 
   for (const element of nextNodes) {
     const nextNodeName = element.resolved
-    // backwards because from the next edge back to the current node
-    // to discover what files are affected with a dependency change
-    graph.addEdge(nextNodeName, curNodeName)
+    graph.addEdge(curNodeName, nextNodeName)
   }
 }
 
@@ -44,7 +42,6 @@ async function run(): Promise<void> {
       buildGraphFromModule(graph, module)
     }
     console.log(graph.toString())
-    console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname)
 
     const github_token = core.getInput('GITHUB_TOKEN')
     const context = github.context
@@ -66,17 +63,30 @@ async function run(): Promise<void> {
       base: pullRequest.base.sha,
       head: pullRequest.head.sha
     })
-    console.log(comparisonDetails.data)
-    console.log(
-      comparisonDetails.data.files
-        ?.filter(file => file.status === 'modified')
-        .map(file => file.filename)
+
+    const files = comparisonDetails.data.files || []
+
+    const affectedFiles = []
+    for (const file of files) {
+      const fileNode = graph.getNode(file.filename)
+      if (fileNode != null) {
+        affectedFiles.push(...fileNode.incomingEdges)
+      }
+    }
+
+    const formattedString = affectedFiles.reduce(
+      (prev, cur) => `${prev}\n - ${cur}`,
+      ''
     )
 
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: ` \`\`\` \n${graph.toString()}\n \`\`\``
+      body: ` 
+        \`\`\` \n
+        ${formattedString}\n 
+        \`\`\`
+      `
     })
 
     core.setOutput('graph', graph.toString())

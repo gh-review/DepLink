@@ -12,14 +12,16 @@ interface IGraph<K, V> {
   getNode(name: K): V | null
 
   /**
-   * Adds a node to the graph
+   * Adds a node to the graph.
    * @param node
+   * @returns true if the node was added, false if it already existed.
    */
   addNode(node: K): Boolean
 
   /**
    * Removes a node from the graph
    * @param node
+   * @returns true if the node was removed, false if it didn't exist.
    */
   removeNode(node: K): Boolean
 
@@ -27,6 +29,7 @@ interface IGraph<K, V> {
    * Adds an edge to the graph between two nodes
    * @param from
    * @param to
+   * @returns true if the edge was added, false if it already existed.
    */
   addEdge(from: K, to: K): Boolean
 
@@ -34,6 +37,7 @@ interface IGraph<K, V> {
    * Removes an edge from the graph between two nodes
    * @param from
    * @param to
+   * @returns true if the edge was removed, false if it didn't exist.
    */
   removeEdge(from: K, to: K): Boolean
 
