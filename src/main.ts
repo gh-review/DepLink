@@ -66,32 +66,44 @@ async function run(): Promise<void> {
 
     const files = comparisonDetails.data.files || []
 
-    const affectedFiles: string[] = []
+    let numAffectedFiles = 0
     const indexFileRegex = /^.*index\.(ts|js)$/
+    let formattedString = ''
+    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${pullRequest.head.ref}/`
+
     for (const file of files.filter(f => f.status !== 'added')) {
       const fileNodeIncomingEdges =
-        graph.getNode(file.filename)?.incomingEdges || []
+        graph.getNode(file.filename)?.incomingEdges || new Set()
 
+      if (fileNodeIncomingEdges.size === 0) continue
+
+      // output file title
+      formattedString += `#### Files affected by ${
+        file.status === 'modified' ? 'changes in' : 'removal of'
+      } \`${file.filename}\`\n**URL:** ${baseURL}${file.filename}\n\n`
+
+      // go through files which list the modified file as a dependency
       for (const dependency of fileNodeIncomingEdges) {
-        affectedFiles.push(dependency)
+        formattedString += `- \`${dependency}\` (${baseURL + dependency})\n`
+        numAffectedFiles += 1
+
+        // check if this file is an index file. If so, search for all files
+        // which depend on it and add them to the list
         if (indexFileRegex.test(dependency)) {
           const indexFileIncomingEdges =
-            graph.getNode(dependency)?.incomingEdges || []
-          affectedFiles.push(...indexFileIncomingEdges)
+            graph.getNode(dependency)?.incomingEdges || new Set()
+          formattedString = Array.from(indexFileIncomingEdges).reduce(
+            (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL + cur})`,
+            formattedString
+          )
         }
       }
     }
 
-    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${pullRequest.head.ref}/`
-    const formattedString = `${affectedFiles.reduce(
-      (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL + cur})`,
-      ''
-    )}`
-
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: `# Affected Files\n**${affectedFiles.length} file(s) affected**\n ${formattedString}\n`
+      body: `# Affected Files\n**${numAffectedFiles} file(s) affected**\n ${formattedString}\n`
     })
 
     core.setOutput('graph', graph.toString())
