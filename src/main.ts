@@ -66,11 +66,19 @@ async function run(): Promise<void> {
 
     const files = comparisonDetails.data.files || []
 
-    const affectedFiles = []
-    for (const file of files) {
-      const fileNode = graph.getNode(file.filename)
-      if (fileNode != null) {
-        affectedFiles.push(...fileNode.incomingEdges)
+    const affectedFiles: string[] = []
+    const indexFileRegex = /^.*index\.(ts|js)$/
+    for (const file of files.filter(f => f.status !== 'added')) {
+      const fileNodeIncomingEdges =
+        graph.getNode(file.filename)?.incomingEdges || []
+
+      for (const dependency of fileNodeIncomingEdges) {
+        affectedFiles.push(dependency)
+        if (indexFileRegex.test(dependency)) {
+          const indexFileIncomingEdges =
+            graph.getNode(dependency)?.incomingEdges || []
+          affectedFiles.push(...indexFileIncomingEdges)
+        }
       }
     }
 
@@ -82,7 +90,7 @@ async function run(): Promise<void> {
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: `# Affected Files\n**${affectedFiles.length} files affected**\n ${formattedString}\n`
+      body: `# Affected Files\n**${affectedFiles.length} file(s) affected**\n ${formattedString}\n`
     })
 
     core.setOutput('graph', graph.toString())
