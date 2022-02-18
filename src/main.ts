@@ -5,6 +5,7 @@ import * as github from '@actions/github'
 import {DirectedGraph, IGraph, Node} from './graph'
 import {ICruiseResult, IModule, cruise} from 'dependency-cruiser'
 
+// test modify
 const dirPath = process.env.GITHUB_WORKSPACE || '.'
 const cruiseOptions = {
   includeOnly: 'src',
@@ -24,9 +25,7 @@ function buildGraphFromModule(
 
   for (const element of nextNodes) {
     const nextNodeName = element.resolved
-    // backwards because from the next edge back to the current node
-    // to discover what files are affected with a dependency change
-    graph.addEdge(nextNodeName, curNodeName)
+    graph.addEdge(curNodeName, nextNodeName)
   }
 }
 
@@ -43,7 +42,6 @@ async function run(): Promise<void> {
       buildGraphFromModule(graph, module)
     }
     console.log(graph.toString())
-    console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname)
 
     const github_token = core.getInput('GITHUB_TOKEN')
     const context = github.context
@@ -66,12 +64,53 @@ async function run(): Promise<void> {
       head: pullRequest.head.sha
     })
 
-    console.log(comparisonDetails.data.files?.filter(file => file.status === "modified").map(file => file.filename))
+    const files = comparisonDetails.data.files || []
+
+    let numAffectedFiles = 0
+    const indexFileRegex = /^.*index\.(ts|js)$/
+    let formattedString = ''
+    const baseURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/${pullRequest.head.ref}/`
+
+    const getFormattedName = (fileName: String): String => {
+      return `[${fileName}](${baseURL}${fileName})`
+    }
+
+    const filteredFiles = files.filter(f => f.status !== 'added')
+
+    for (const file of filteredFiles) {
+      const fileNodeIncomingEdges =
+        graph.getNode(file.filename)?.incomingEdges || new Set()
+
+      if (fileNodeIncomingEdges.size === 0) continue
+
+      // output file title
+      formattedString += `### ${
+        file.status === 'modified' ? 'Changes in' : 'Removal of'
+      } ${getFormattedName(file.filename)} may affect:\n`
+
+      // go through files which list the modified file as a dependency
+      for (const dependency of fileNodeIncomingEdges) {
+        formattedString += `- ${getFormattedName(dependency)}\n`
+        numAffectedFiles += 1
+
+        // check if this file is an index file. If so, search for all files
+        // which depend on it and add them to the list
+        if (indexFileRegex.test(dependency)) {
+          const indexFileIncomingEdges =
+            graph.getNode(dependency)?.incomingEdges || new Set()
+          numAffectedFiles += indexFileIncomingEdges.size
+          formattedString = Array.from(indexFileIncomingEdges).reduce(
+            (prev, cur) => `${prev}- ${getFormattedName(cur)}\n`,
+            formattedString
+          )
+        }
+      }
+    }
 
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: ` \`\`\` \n${graph.toString()}\n \`\`\``
+      body: `# Affected Files\n- Total Affected File(s): ${numAffectedFiles}\n---\n${formattedString}\n`
     })
 
     core.setOutput('graph', graph.toString())
