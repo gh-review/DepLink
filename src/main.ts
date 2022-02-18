@@ -74,7 +74,7 @@ async function run(): Promise<void> {
       }
     }
 
-    const formattedString = `# Affected Files\n${affectedFiles.reduce(
+    const formattedString = `${affectedFiles.reduce(
       (prev, cur) => `${prev}\n - \`${cur}\``,
       ''
     )}`
@@ -82,9 +82,7 @@ async function run(): Promise<void> {
     await octokit.rest.issues.createComment({
       ...context.repo,
       issue_number: pullRequest.number,
-      body: ` 
-        ${formattedString}\n 
-      `
+      body: `# Affected Files\n**${affectedFiles.length} files affected**\n ${formattedString}\n`
     })
 
     core.setOutput('graph', graph.toString())
