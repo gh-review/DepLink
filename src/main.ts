@@ -84,7 +84,7 @@ async function run(): Promise<void> {
 
     const baseURL = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/`
     const formattedString = `${affectedFiles.reduce(
-      (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL} + ${cur})`,
+      (prev, cur) => `${prev}\n - \`${cur}\` (${baseURL + cur})`,
       ''
     )}`
 
