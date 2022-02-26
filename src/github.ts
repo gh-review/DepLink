@@ -37,7 +37,6 @@ export const isPullRequest = (): boolean => {
     context.payload.pull_request == null ||
     context.eventName !== 'pull_request'
   ) {
-    core.setFailed('No pull request found.')
     return false
   }
 

@@ -21,7 +21,7 @@ async function run(): Promise<void> {
       buildGraphFromModule(graph, module)
     }
 
-    if (isPullRequest()) {
+    if (!isPullRequest()) {
       core.setFailed('No pull request found.')
       return
     }
