@@ -1,16 +1,14 @@
 import * as core from '@actions/core'
 
 import {ICruiseResult, cruise} from 'dependency-cruiser'
-import {cruiseOptions, dirPath} from './constant'
+import {buildGraphFromModule, getAffectedFilesMarkdown} from './utils'
 import {
   createPullRequestComment,
   getAffectedFiles,
-  isPullRequest,
-  pullRequestHeadRef,
-  repoURL
+  isPullRequest
 } from './github'
+import {cruiseOptions, dirPath} from './constant'
 import {DirectedGraph} from './graph'
-import {buildGraphFromModule, getAffectedFilesMarkdown} from './utils'
 
 async function run(): Promise<void> {
   try {
@@ -30,7 +28,7 @@ async function run(): Promise<void> {
 
     const files = await getAffectedFiles()
 
-    const markdown = getAffectedFilesMarkdown({files, graph})
+    const markdown = getAffectedFilesMarkdown(files, graph)
 
     await createPullRequestComment(markdown)
 

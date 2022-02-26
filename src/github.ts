@@ -11,6 +11,27 @@ export const repoURL = `${context.serverUrl}/${context.repo.owner}/${context.rep
 
 export const pullRequestHeadRef = pullRequest?.head.ref
 
+export interface AffectedFile {
+  sha: string
+  filename: string
+  status:
+    | 'added'
+    | 'removed'
+    | 'modified'
+    | 'renamed'
+    | 'copied'
+    | 'changed'
+    | 'unchanged'
+  additions: number
+  deletions: number
+  changes: number
+  blob_url: string
+  raw_url: string
+  contents_url: string
+  patch?: string
+  previous_filename?: string
+}
+
 export const isPullRequest = (): boolean => {
   if (
     context.payload.pull_request == null ||
@@ -23,18 +44,19 @@ export const isPullRequest = (): boolean => {
   return true
 }
 
-export const getAffectedFiles = async () => {
+export const getAffectedFiles = async (): Promise<AffectedFile[]> => {
   const comparisonDetails = await octokit.rest.repos.compareCommits({
     ...context.repo,
     base: pullRequest?.base.sha,
     head: pullRequest?.head.sha
   })
 
-  // @ts-ignore
-  return (comparisonDetails.data.files || []).status !== 'added'
+  return (comparisonDetails.data.files || []).filter(f => f.status !== 'added')
 }
 
-export const createPullRequestComment = async (markdown: string) => {
+export const createPullRequestComment = async (
+  markdown: string
+): Promise<void> => {
   await octokit.rest.issues.createComment({
     ...context.repo,
     issue_number: pullRequest?.number,

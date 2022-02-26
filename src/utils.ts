@@ -1,6 +1,6 @@
+import {AffectedFile, pullRequestHeadRef, repoURL} from './github'
 import {IGraph, Node} from './graph'
 import {IModule} from 'dependency-cruiser'
-import {pullRequestHeadRef, repoURL} from './github'
 import {indexFileRegex} from './constant'
 
 export function buildGraphFromModule(
@@ -16,13 +16,16 @@ export function buildGraphFromModule(
     graph.addEdge(curNodeName, nextNodeName)
   }
 }
-// @ts-ignore
-export const getAffectedFilesMarkdown = ({files, graph}): any => {
+
+export const getAffectedFilesMarkdown = (
+  files: AffectedFile[],
+  graph: IGraph<String, Node>
+): string => {
   let numAffectedFiles = 0
   let formattedString = ''
   const baseURL = `${repoURL}/blob/${pullRequestHeadRef}/`
 
-  const getFormattedName = (fileName: String): String => {
+  const getFormattedName = (fileName: string): string => {
     return `[${fileName}](${baseURL}${fileName})`
   }
 
@@ -48,10 +51,9 @@ export const getAffectedFilesMarkdown = ({files, graph}): any => {
         const indexFileIncomingEdges =
           graph.getNode(dependency)?.incomingEdges || new Set()
         numAffectedFiles += indexFileIncomingEdges.size
-        // @ts-ignore
         formattedString = Array.from(indexFileIncomingEdges).reduce(
-          // @ts-ignore
-          (prev, cur) => `${prev}- ${getFormattedName(cur)}\n`,
+          (prev: string, cur: string): string =>
+            `${prev}- ${getFormattedName(cur)}\n`,
           formattedString
         )
       }
