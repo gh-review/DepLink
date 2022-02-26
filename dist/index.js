@@ -1,6 +1,92 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 2363:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.indexFileRegex = exports.cruiseOptions = exports.dirPath = void 0;
+exports.dirPath = process.env.GITHUB_WORKSPACE || '.';
+exports.cruiseOptions = {
+    includeOnly: '',
+    exclude: ['^(coverage|test|node_modules)', '__tests__'],
+    tsConfig: {
+        fileName: 'tsconfig.json'
+    }
+};
+exports.indexFileRegex = /^.*index\.(ts|js|tsx|jsx)$/;
+
+
+/***/ }),
+
+/***/ 85928:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createPullRequestComment = exports.getAffectedFiles = exports.isPullRequest = exports.pullRequestHeadRef = exports.repoURL = void 0;
+const core = __importStar(__nccwpck_require__(42186));
+const github = __importStar(__nccwpck_require__(95438));
+const github_token = core.getInput('GITHUB_TOKEN');
+const octokit = github.getOctokit(github_token);
+const context = github.context;
+const pullRequest = context.payload.pull_request;
+exports.repoURL = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}`;
+exports.pullRequestHeadRef = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
+const isPullRequest = () => {
+    if (context.payload.pull_request == null ||
+        context.eventName !== 'pull_request') {
+        core.setFailed('No pull request found.');
+        return false;
+    }
+    return true;
+};
+exports.isPullRequest = isPullRequest;
+const getAffectedFiles = () => __awaiter(void 0, void 0, void 0, function* () {
+    const comparisonDetails = yield octokit.rest.repos.compareCommits(Object.assign(Object.assign({}, context.repo), { base: pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.sha, head: pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.sha }));
+    // @ts-ignore
+    return (comparisonDetails.data.files || []).status !== 'added';
+});
+exports.getAffectedFiles = getAffectedFiles;
+const createPullRequestComment = (markdown) => __awaiter(void 0, void 0, void 0, function* () {
+    yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number, body: markdown }));
+});
+exports.createPullRequestComment = createPullRequestComment;
+
+
+/***/ }),
+
 /***/ 72027:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -204,53 +290,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(42186));
-const fs = __importStar(__nccwpck_require__(35747));
-const github = __importStar(__nccwpck_require__(95438));
-const graph_1 = __nccwpck_require__(65624);
 const dependency_cruiser_1 = __nccwpck_require__(72700);
-const dirPath = process.env.GITHUB_WORKSPACE || '.';
-const cruiseOptions = {
-    includeOnly: 'src',
-    exclude: ['^(coverage|test|node_modules)', '__tests__'],
-    tsConfig: {
-        fileName: 'tsconfig.json'
-    }
-};
-function buildGraphFromModule(graph, currentModule) {
-    const nextNodes = currentModule.dependencies || [];
-    const curNodeName = currentModule.source;
-    graph.addNode(curNodeName);
-    for (const element of nextNodes) {
-        const nextNodeName = element.resolved;
-        // backwards because from the next edge back to the current node
-        // to discover what files are affected with a dependency change
-        graph.addEdge(nextNodeName, curNodeName);
-    }
-}
+const constant_1 = __nccwpck_require__(2363);
+const github_1 = __nccwpck_require__(85928);
+const graph_1 = __nccwpck_require__(65624);
+const utils_1 = __nccwpck_require__(50918);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log(`Initial: ${dirPath}`, fs.readdirSync(dirPath));
-            const cruiseResult = (0, dependency_cruiser_1.cruise)([dirPath], cruiseOptions)
+            const cruiseResult = (0, dependency_cruiser_1.cruise)([constant_1.dirPath], constant_1.cruiseOptions)
                 .output;
-            console.dir(cruiseResult, { depth: 10 });
             const graph = new graph_1.DirectedGraph();
             for (const module of cruiseResult.modules) {
-                buildGraphFromModule(graph, module);
+                (0, utils_1.buildGraphFromModule)(graph, module);
             }
-            console.log(graph.toString());
-            console.log(process.env.GITHUB_WORKSPACE, dirPath, __dirname);
-            const github_token = core.getInput('GITHUB_TOKEN');
-            const context = github.context;
-            if (context.payload.pull_request == null ||
-                context.eventName !== 'pull_request') {
+            if ((0, github_1.isPullRequest)()) {
                 core.setFailed('No pull request found.');
                 return;
             }
-            const pullRequest = context.payload.pull_request;
-            const octokit = github.getOctokit(github_token);
-            console.log(yield octokit.rest.repos.compareCommits(Object.assign(Object.assign({}, context.repo), { base: pullRequest.base.sha, head: pullRequest.head.sha })));
-            yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pullRequest.number, body: ` \`\`\` \n${graph.toString()}\n \`\`\`` }));
+            const files = yield (0, github_1.getAffectedFiles)();
+            const markdown = (0, utils_1.getAffectedFilesMarkdown)({ files, graph });
+            yield (0, github_1.createPullRequestComment)(markdown);
             core.setOutput('graph', graph.toString());
         }
         catch (error) {
@@ -260,6 +320,63 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 50918:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getAffectedFilesMarkdown = exports.buildGraphFromModule = void 0;
+const github_1 = __nccwpck_require__(85928);
+const constant_1 = __nccwpck_require__(2363);
+function buildGraphFromModule(graph, currentModule) {
+    const nextNodes = currentModule.dependencies || [];
+    const curNodeName = currentModule.source;
+    graph.addNode(curNodeName);
+    for (const element of nextNodes) {
+        const nextNodeName = element.resolved;
+        graph.addEdge(curNodeName, nextNodeName);
+    }
+}
+exports.buildGraphFromModule = buildGraphFromModule;
+// @ts-ignore
+const getAffectedFilesMarkdown = ({ files, graph }) => {
+    var _a, _b;
+    let numAffectedFiles = 0;
+    let formattedString = '';
+    const baseURL = `${github_1.repoURL}/blob/${github_1.pullRequestHeadRef}/`;
+    const getFormattedName = (fileName) => {
+        return `[${fileName}](${baseURL}${fileName})`;
+    };
+    for (const file of files) {
+        const fileNodeIncomingEdges = ((_a = graph.getNode(file.filename)) === null || _a === void 0 ? void 0 : _a.incomingEdges) || new Set();
+        if (fileNodeIncomingEdges.size === 0)
+            continue;
+        // output file title
+        formattedString += `### ${file.status === 'modified' ? 'Changes in' : 'Removal of'} ${getFormattedName(file.filename)} may affect:\n`;
+        // go through files which list the modified file as a dependency
+        for (const dependency of fileNodeIncomingEdges) {
+            formattedString += `- ${getFormattedName(dependency)}\n`;
+            numAffectedFiles += 1;
+            // check if this file is an index file. If so, search for all files
+            // which depend on it and add them to the list
+            if (constant_1.indexFileRegex.test(dependency)) {
+                const indexFileIncomingEdges = ((_b = graph.getNode(dependency)) === null || _b === void 0 ? void 0 : _b.incomingEdges) || new Set();
+                numAffectedFiles += indexFileIncomingEdges.size;
+                // @ts-ignore
+                formattedString = Array.from(indexFileIncomingEdges).reduce(
+                // @ts-ignore
+                (prev, cur) => `${prev}- ${getFormattedName(cur)}\n`, formattedString);
+            }
+        }
+    }
+    return `# Affected Files\n- Total Affected File(s): ${numAffectedFiles}\n---\n${formattedString}\n`;
+};
+exports.getAffectedFilesMarkdown = getAffectedFilesMarkdown;
 
 
 /***/ }),
